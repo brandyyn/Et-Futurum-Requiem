@@ -158,6 +158,7 @@ public class EtFuturum {
 			Logger.info(Tags.MOD_ID + " is in snapshot mode. Disabling update checker... Other features may also be different.");
 		}
 
+		ConfigBase.onConstructing();
 		MCLib.init();
 
 		ADConfig config = new ADConfig();
@@ -178,6 +179,9 @@ public class EtFuturum {
 	@EventHandler
 	@SuppressWarnings("unchecked")
 	public void preInit(FMLPreInitializationEvent event) {
+		if(ModsList.IRON_CHEST.isLoaded()) {
+			CompatIronChests.init();
+		}
 		try {
 			Field chestInfo = ChestGenHooks.class.getDeclaredField("chestInfo");
 			chestInfo.setAccessible(true);
@@ -191,6 +195,11 @@ public class EtFuturum {
 			e.printStackTrace();
 		}
 
+		ModBlocks.init();
+		ModItems.init();
+		ModEnchantments.init();
+		ModPotions.init();
+		SpectatorMode.init();
 
 		for (ModBlocks block : ModBlocks.values()) {
 			if (block.isEnabled() && block.get() instanceof IInitAction) {
@@ -202,12 +211,6 @@ public class EtFuturum {
 				((IInitAction) item.get()).preInitAction();
 			}
 		}
-
-		ModBlocks.init();
-		ModItems.init();
-		ModEnchantments.init();
-		ModPotions.init();
-		SpectatorMode.init();
 
 		if (event.getSide() == Side.CLIENT) {
 
@@ -273,6 +276,8 @@ public class EtFuturum {
 		proxy.registerRenderers();
 
 		CompatMisc.runModHooksInit();
+
+		ConfigBase.init();
 	}
 
 	@EventHandler
@@ -354,10 +359,6 @@ public class EtFuturum {
 		}
 
 		EtFuturumLootTables.init();
-
-		if(ModsList.IRON_CHEST.isLoaded()) {
-			CompatIronChests.init();
-		}
 		ModRecipes.init();
 		DeepslateOreRegistry.init();
 		StrippedLogRegistry.init();
@@ -385,8 +386,6 @@ public class EtFuturum {
 				((IInitAction) item.get()).onLoadAction();
 			}
 		}
-
-		ConfigBase.postInit();
 
 		EtFuturumWorldGenerator.INSTANCE.postInit();
 		WorldEventHandler.INSTANCE.postInit();

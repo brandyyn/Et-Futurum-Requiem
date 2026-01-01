@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class GuiBarrel extends GuiContainer {
 
 	private static final ResourceLocation[] backgrounds = Arrays.stream(BarrelType.VALUES)
-			.map(t -> t.getGuiTextureName() == null ? new ResourceLocation("textures/gui/container/generic_54.png") :
+			.map(t -> t.getGuiTextureName() == null ? new ResourceLocation("textures/gui/container/barrel.png") :
 					new ResourceLocation(String.format("etfuturum:textures/gui/container/ironbarrels/%s.png", t.getGuiTextureName())))
 			.toArray(ResourceLocation[]::new);
 	private final IInventory upperChestInventory;
@@ -68,11 +68,6 @@ public class GuiBarrel extends GuiContainer {
 			return;
 		}
 
-		if (type == BarrelType.WOOD) {
-			this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.inventoryRows * 18 + 17);
-			this.drawTexturedModalRect(k, l + this.inventoryRows * 18 + 17, 0, 126, this.xSize, 96);
-		} else {
-			this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
-		}
+		this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
 	}
 }

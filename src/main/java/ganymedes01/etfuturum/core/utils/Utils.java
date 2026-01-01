@@ -55,10 +55,6 @@ public class Utils {
 		return Reference.ITEM_BLOCK_TEXTURE_PATH + name;
 	}
 
-	public static ResourceLocation getResource(String path) {
-		return new ResourceLocation(path);
-	}
-
 	public static String getConainerName(String name) {
 		return "container." + Tags.MOD_ID + "." + name;
 	}

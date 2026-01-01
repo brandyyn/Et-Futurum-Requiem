@@ -10,6 +10,7 @@ import ganymedes01.etfuturum.configuration.configs.ConfigModCompat;
 import ganymedes01.etfuturum.core.utils.EtFuturumResources;
 import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.inventory.ContainerChestGeneric;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +29,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class TileEntityShulkerBox extends TileEntity implements IInventory {
 	private int ticksSinceSync;
@@ -532,7 +535,7 @@ public class TileEntityShulkerBox extends TileEntity implements IInventory {
 	}
 
 	public enum ShulkerBoxType {
-		VANILLA(27, 9, false, 184, 168, null, EtFuturumResources.SHULKERS),
+		VANILLA(27, 9, false, 184, 166, null, EtFuturumResources.SHULKERS),
 		IRON(54, 9, false, 184, 202, "ironcontainer", EtFuturumResources.IRON_SHULKERS),
 		GOLD(81, 9, false, 184, 256, "goldcontainer", EtFuturumResources.GOLD_SHULKERS),
 		DIAMOND(108, 12, false, 238, 256, "diamondcontainer", EtFuturumResources.DIAMOND_SHULKERS),
@@ -550,6 +553,14 @@ public class TileEntityShulkerBox extends TileEntity implements IInventory {
 		private final int ySize;
 		private final String guiTextureName;
 		private final ResourceLocation[] boxTextures;
+		public static final Map<String, ShulkerBoxType> map;
+		static {
+			Object2ObjectLinkedOpenHashMap<String, ShulkerBoxType> temp = new Object2ObjectLinkedOpenHashMap<>();
+			for(ShulkerBoxType type : values()) {
+				temp.put(type.name(), type);
+			}
+			map = Collections.unmodifiableMap(temp);
+		}
 
 		ShulkerBoxType(int size, int rowSize, boolean isClear, int xSize, int ySize, String guiTextureName, ResourceLocation[] boxTextures) {
 			this.size = size;

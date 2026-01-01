@@ -31,7 +31,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class BlockBarrel extends BlockContainer {
@@ -119,11 +118,8 @@ public class BlockBarrel extends BlockContainer {
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float subX, float subY, float subZ) {
 		if (world.isRemote) {
-			if(player.getHeldItem() != null && player.getHeldItem().getItem() != null && world.getTileEntity(x, y, z) instanceof TileEntityBarrel barrel) {
-				String upgrade = CompatIronChests.getNextBarrelUpgrade(barrel.type.name(), player.getHeldItem());
-				if(upgrade != null && Arrays.stream(TileEntityBarrel.BarrelType.VALUES).noneMatch(o -> o.name().equals(upgrade))) {
-					FMLClientHandler.instance().getClient().ingameGUI.func_110326_a(I18n.format("\u00a7cefr.ironchest.cannot_use"), false);
-				}
+			if(ConfigModCompat.barrelIronChest && player.getHeldItem() != null && player.getHeldItem().getItem() != null && world.getTileEntity(x, y, z) instanceof TileEntityBarrel barrel) {
+				handleIronChestClientWarning(world, x, y, z, player, barrel);
 			}
 			return true;
 		}
@@ -133,27 +129,42 @@ public class BlockBarrel extends BlockContainer {
 		}
 
 		if(ConfigModCompat.barrelIronChest && player.getHeldItem() != null) {
-			ItemStack upgradeStack = player.getHeldItem();
-			String upgrade = CompatIronChests.getNextBarrelUpgrade(barrel.type.name(), upgradeStack);
-			if (upgrade != null) {
-				if(Arrays.stream(TileEntityBarrel.BarrelType.VALUES).anyMatch(o -> o.name().equals(upgrade))) {
-					barrel.upgrading = true;
-					ItemStack[] tempCopy = barrel.chestContents == null ? new ItemStack[barrel.getSizeInventory()] : ArrayUtils.clone(barrel.chestContents);
-					TileEntityBarrel newTE = (TileEntityBarrel) TileEntityBarrel.BarrelType.valueOf(upgrade).getBlock().createTileEntity(world, barrel.getBlockMetadata());
-					System.arraycopy(tempCopy, 0, newTE.chestContents, 0, tempCopy.length);
-					if (!player.capabilities.isCreativeMode) {
-						upgradeStack.stackSize--;
-					}
-					world.setBlock(x, y, z, newTE.type.getBlock(), barrel.getBlockMetadata(), 3);
-					world.setTileEntity(x, y, z, newTE);
-					world.markBlockForUpdate(x, y, z);
-				}
+			if(handleIronChestUpgrade(world, x, y, z, player, barrel)) {
 				return true;
 			}
 		}
 
 		player.openGui(EtFuturum.instance, GUIIDs.BARREL, world, x, y, z);
 		return true;
+	}
+
+	private void handleIronChestClientWarning(World world, int x, int y, int z, EntityPlayer player, TileEntityBarrel barrel) {
+		String upgrade = CompatIronChests.getNextBarrelUpgrade(barrel.type.name(), player.getHeldItem());
+		if(upgrade != null && !TileEntityBarrel.BarrelType.map.containsKey(upgrade)) {
+			FMLClientHandler.instance().getClient().ingameGUI.func_110326_a("\u00a7c" + I18n.format("efr.ironchest.cannot_use"), false);
+		}
+	}
+
+	private boolean handleIronChestUpgrade(World world, int x, int y, int z, EntityPlayer player, TileEntityBarrel barrel) {
+		ItemStack upgradeStack = player.getHeldItem();
+		String upgrade = CompatIronChests.getNextBarrelUpgrade(barrel.type.name(), upgradeStack);
+		if (upgrade != null) {
+			TileEntityBarrel.BarrelType newType = TileEntityBarrel.BarrelType.map.get(upgrade);
+			if(newType != null) {
+				barrel.upgrading = true;
+				ItemStack[] tempCopy = barrel.chestContents == null ? new ItemStack[barrel.getSizeInventory()] : ArrayUtils.clone(barrel.chestContents);
+				TileEntityBarrel newTE = (TileEntityBarrel) newType.getBlock().createTileEntity(world, barrel.getBlockMetadata());
+				System.arraycopy(tempCopy, 0, newTE.chestContents, 0, tempCopy.length);
+				if (!player.capabilities.isCreativeMode) {
+					upgradeStack.stackSize--;
+				}
+				world.setBlock(x, y, z, newTE.type.getBlock(), barrel.getBlockMetadata(), 3);
+				world.setTileEntity(x, y, z, newTE);
+				world.markBlockForUpdate(x, y, z);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public IInventory getInventory(World p_149951_1_, int p_149951_2_, int p_149951_3_, int p_149951_4_) {

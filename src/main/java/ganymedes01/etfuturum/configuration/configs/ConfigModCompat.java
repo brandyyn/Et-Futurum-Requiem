@@ -1,6 +1,7 @@
 package ganymedes01.etfuturum.configuration.configs;
 
 import com.google.common.collect.Lists;
+import ganymedes01.etfuturum.compat.ModsList;
 import ganymedes01.etfuturum.configuration.ConfigBase;
 
 import java.io.File;
@@ -80,5 +81,12 @@ public class ConfigModCompat extends ConfigBase {
 				"\nUseful if you have mods like Chisel or Botania which feature these same stones but not the stairs and other variants.");
 		disableCopperOreAndIngotOnly = getBoolean("disableCopperOreAndIngotOnly", catMisc, false, "Disables copper ingots and ores, but leaves the blocks and other stuff." +
 				"\nUseful if you prefer another mod's copper, but want to use the oxidizing copper building blocks.");
+	}
+
+	@Override
+	protected void onConstructingValues() {
+		if(!ModsList.IRON_CHEST.isLoaded()) {
+			shulkerBoxesIronChest = barrelIronChest = shulkerBoxesIronChestUpgradeItem = barrelIronChestUpgradeItem = false;
+		}
 	}
 }

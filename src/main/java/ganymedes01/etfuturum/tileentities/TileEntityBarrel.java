@@ -7,6 +7,7 @@ import ganymedes01.etfuturum.client.sound.ModSounds;
 import ganymedes01.etfuturum.configuration.configs.ConfigModCompat;
 import ganymedes01.etfuturum.core.utils.Utils;
 import ganymedes01.etfuturum.inventory.ContainerChestGeneric;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -18,9 +19,7 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class TileEntityBarrel extends TileEntity implements IInventory {
 	private int ticksSinceSync;
@@ -393,6 +392,14 @@ public class TileEntityBarrel extends TileEntity implements IInventory {
 		private final boolean clear;
 		private final String guiTextureName;
 		private final Block.SoundType sound;
+		public static final Map<String, BarrelType> map;
+		static {
+			Object2ObjectLinkedOpenHashMap<String, BarrelType> temp = new Object2ObjectLinkedOpenHashMap<>();
+			for(BarrelType type : values()) {
+				temp.put(type.name(), type);
+			}
+			map = Collections.unmodifiableMap(temp);
+		}
 
 		BarrelType(int size, int rowSize, int xSize, int ySize, boolean clear, String guiTextureName, Block.SoundType sound) {
 			this.size = size;

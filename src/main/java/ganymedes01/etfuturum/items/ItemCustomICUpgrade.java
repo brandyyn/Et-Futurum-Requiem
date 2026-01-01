@@ -34,7 +34,7 @@ public class ItemCustomICUpgrade extends BaseSubtypesItem {
 	public void getSubItems(Item item, CreativeTabs tabs, List<ItemStack> list) {
 		for(int i = 0; i < types.length; i++) {
 			var stack = new ItemStack(item, 1, i);
-			if(CompatIronChests.isUpgradeEnabled(upgrades[i][0], upgrades[i][1])) {
+			if(CompatIronChests.upgradeExists(upgrades[i][0], upgrades[i][1])) {
 				list.add(stack);
 			}
 		}
